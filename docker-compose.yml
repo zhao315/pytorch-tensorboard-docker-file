@@ -1,0 +1,29 @@
+version: "2"
+
+services:
+  pytorch:
+    build: ./pytorch
+    image: zhao315/pytorch
+    ports:
+      - "8888:8888"
+    volumes:
+      - "./workspace:/app"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 2
+              capabilities: [gpu]
+
+    command: sh -c "jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root"
+
+  tensorboard:
+    build: ./tensorboard
+    image: zhao315/tensorboard
+    ports:
+      - "6006:6006"
+    volumes:
+      - "./workspace/logs:/app/logs"
+
+    command: sh -c "tensorboard --logdir=./app/logs --host=0.0.0.0 --port=6006"
